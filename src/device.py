@@ -1,5 +1,7 @@
-# Comunicação HID de baixo nível com o teclado
-# Usado para coletar as configs, ler/enviar relatórios, etc
+"""
+Comunicacao HID de baixo nivel com o teclado: listar dispositivos,
+encontrar a interface/collection certa e enviar relatorios.
+"""
 
 import hid
 
@@ -8,12 +10,17 @@ import hid
 VENDOR_SPECIFIC_USAGE_PAGE_MIN = 0xFF00
 VENDOR_SPECIFIC_USAGE_PAGE_MAX = 0xFFFF
 
-# Lista todos os devices HID conectados
+
 def list_all_devices() -> list[dict]:
+    """Lista todos os dispositivos HID conectados no computador."""
     return hid.enumerate()
 
-# Lista os devices mais prováveis de serem controladores de iluminação
+
 def list_candidate_devices() -> list[dict]:
+    """
+    Lista dispositivos HID cujo usage_page esta na faixa vendor-specific
+    (0xff00-0xffff) - candidatos mais provaveis a controle de iluminacao.
+    """
     candidates = []
     for d in hid.enumerate():
         usage_page = d.get("usage_page", 0)
@@ -21,8 +28,9 @@ def list_candidate_devices() -> list[dict]:
             candidates.append(d)
     return candidates
 
-# Acha o path da interface de um device HID informado
+
 def find_target_path(vid: int, pid: int, interface_number: int, usage_page: int | None = None) -> bytes | None:
+    """Acha o 'path' da interface/collection especifica de um dispositivo HID."""
     candidates = [
         d for d in hid.enumerate(vid, pid)
         if d.get("interface_number") == interface_number
@@ -35,8 +43,9 @@ def find_target_path(vid: int, pid: int, interface_number: int, usage_page: int 
         return None
     return candidates[0]["path"]
 
-# Abre a conexão HID usando uma config já salva anteriormente
+
 def open_by_config(cfg: dict) -> "hid.device":
+    """Abre a conexao HID usando uma configuracao ja salva."""
     path = find_target_path(
         cfg["vendor_id"],
         cfg["product_id"],
@@ -51,12 +60,14 @@ def open_by_config(cfg: dict) -> "hid.device":
         )
     return open_by_path(path)
 
-# Abre a conexão usando o path diretamente
+
 def open_by_path(path: bytes) -> "hid.device":
+    """Abre a conexao HID diretamente por um path especifico."""
     dev = hid.device()
     dev.open_path(path)
     return dev
 
-# Envia um relatório ao device conectado
+
 def send_report(dev: "hid.device", report: bytes) -> int:
+    """Envia um relatorio HID para o dispositivo ja aberto."""
     return dev.write(report)

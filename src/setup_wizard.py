@@ -1,22 +1,15 @@
-# Assistente de config inicial do teclado, para identificar o device
-# Busca por candidatos que podem corresponder ao controlador
-# Envia relatórios de teste para confirmação visual
-# Caso a identificação automática falhe, cai para a configuração de IDs manual
+"""
+Assistente de identificacao do teclado: lista candidatos prováveis,
+testa uma cor em cada um pedindo confirmacao visual da pessoa, e
+salva a configuracao encontrada. Se nada for confirmado, cai para
+entrada manual dos IDs.
+"""
 
 from . import config
 from . import device
 from . import colors
 
-# Sequência de cores de teste (Vermelho, Azul, Vermelho, Azul)
-sequence = [
-    (255, 255, 255),
-    (255, 0, 0),
-    (0, 255, 0),
-    (0, 0, 255),
-    (255, 255, 255),
-]
 
-# Recebe um dicionário de dados do device e cria as strings com as infos do device
 def _describe(d: dict) -> str:
     manuf = d.get("manufacturer_string") or "?"
     prod = d.get("product_string") or "?"
@@ -26,8 +19,9 @@ def _describe(d: dict) -> str:
     usage_page = d.get("usage_page", 0)
     return f"{manuf} / {prod}  (VID={vid:#06x} PID={pid:#06x} iface={iface} usage_page={usage_page:#06x})"
 
-# Abre conexão com um candidato, envia a sequência de cores de teste, e pede confirmação visual
+
 def _try_candidate(d: dict) -> bool:
+    """Abre o candidato, manda uma cor de teste (vermelho) e pede confirmacao."""
     try:
         dev = device.open_by_path(d["path"])
     except OSError as e:
@@ -35,19 +29,17 @@ def _try_candidate(d: dict) -> bool:
         return False
 
     try:
-        for i, (r, g, b) in enumerate(sequence):
-            report = colors.build_color_report(r, g, b)
-            device.send_report(dev, report)
-            if i < len(sequence) - 1:
-                time.sleep(0.4)
+        report = colors.build_color_report(255, 0, 0)
+        device.send_report(dev, report)
     finally:
         dev.close()
 
-    resposta = input("  A cor do teclado mudou? [s/n]: ").strip().lower()
+    resposta = input("  A cor do teclado mudou para vermelho? [s/n]: ").strip().lower()
     return resposta.startswith("s")
 
-# Fallback caso a identificação falhe
+
 def _manual_entry() -> dict:
+    """Fallback: pede os IDs do teclado manualmente."""
     print("\nInforme os dados manualmente. No Windows, use o Gerenciador de Dispositivos")
     print("(Propriedades > Detalhes > Hardware Ids). No Linux, use 'lsusb'.")
     vendor_id = int(input("Vendor ID (hex, ex: 0c45): ").strip(), 16)
@@ -62,8 +54,12 @@ def _manual_entry() -> dict:
         "usage_page": usage_page,
     }
 
-# Roda o Wizard, salva a config encontrada e a devolve
+
 def run_wizard() -> dict:
+    """
+    Executa o assistente de identificacao do teclado, salva a
+    configuracao encontrada e a devolve.
+    """
     print("\n=== Assistente de identificacao do teclado ===")
     print("Procurando dispositivos com controle proprietario (possivel iluminacao RGB)...\n")
 

@@ -99,3 +99,7 @@ Pull requests são bem-vindos, especialmente para:
 - Suporte a novos efeitos de iluminação
 - Testes e ajustes para Linux
 - Melhorias na interface CLI
+
+## Licença
+
+<!-- Defina a licença do projeto, ex: MIT -->
