@@ -13,9 +13,9 @@ MENU = """
 1. Definir cor (HEX)
 2. Escolher modo de iluminação
 3. Brilho
-3. Testar cor original (diagnostico)
-4. Reconfigurar teclado (VID/PID)
-5. Sair
+4. Testar cor original (diagnostico)
+5. Reconfigurar teclado (VID/PID)
+6. Sair
 
 """
 
