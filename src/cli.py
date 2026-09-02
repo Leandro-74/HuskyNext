@@ -40,8 +40,11 @@ def _modes_menu_text() -> str:
 
 # Recupera o último state do device, caso não haja, retorna o padrão
 def _load_initial_state(cfg: dict) -> colors.KeyboardState:
-    if all(k in cfg for k in ("effect", "r", "g", "b")):
-        return colors.KeyboardState(effect=cfg["effect"], r=cfg["r"], g=cfg["g"], b=cfg["b"])
+    if all(k in cfg for k in ("effect", "bright", "r", "g", "b")):
+        return colors.KeyboardState(
+            effect=cfg["effect"], bright=cfg["bright"],
+            r=cfg["r"], g=cfg["g"], b=cfg["b"]
+            )
     return colors.KeyboardState()
 
 # Abre o device, monta o report, envia e salva o state atual
@@ -55,7 +58,7 @@ def _enviar(cfg: dict, state: colors.KeyboardState, descricao: str) -> None:
         report = colors.build_report(state)
         n = device.send_report(dev, report)
         print(f"{descricao} - {n} bytes escritos.")
-        config.save_state(state.effect, state.r, state.g, state.b)
+        config.save_state(state.effect, state.bright, state.r, state.g, state.b)
     finally:
         dev.close()
 

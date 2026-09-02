@@ -47,10 +47,10 @@ def save_device(vendor_id: int, product_id: int, interface_number: int, usage_pa
     _write(data)
 
 
-def save_state(effect: int, r: int, g: int, b: int) -> None:
+def save_state(effect: int, bright: int, r: int, g: int, b: int) -> None:
     """Salva o ultimo modo/cor enviados, preservando a identificacao do dispositivo."""
     data = _read()
-    data.update({"effect": effect, "r": r, "g": g, "b": b})
+    data.update({"effect": effect, "bright": bright, "r": r, "g": g, "b": b})
     _write(data)
 
 
