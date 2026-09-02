@@ -27,32 +27,60 @@ def _try_candidate(d: dict) -> bool:
         return False
 
     try:
-        
-        report = colors.build_report(colors.KeyboardState)
+        report = colors.build_report(colors.KeyboardState()) # Instância correta
         device.send_report(dev, report)
-    finally:
+    except (OSError, IOError) as e:
+        print(f"  Falha ao enviar pacote de teste: {e}")
         dev.close()
+        return False
+    finally:
+        try:
+            dev.close()
+        except Exception:
+            pass
 
     resposta = input("  A cor do teclado mudou para vermelho? [s/n]: ").strip().lower()
     return resposta.startswith("s")
 
-
 def _manual_entry() -> dict:
-    """Fallback: pede os IDs do teclado manualmente."""
-    print("\nInforme os dados manualmente. No Windows, use o Gerenciador de Dispositivos")
-    print("(Propriedades > Detalhes > Hardware Ids). No Linux, use 'lsusb'.")
-    vendor_id = int(input("Vendor ID (hex, ex: 0c45): ").strip(), 16)
-    product_id = int(input("Product ID (hex, ex: 8501): ").strip(), 16)
-    interface_number = int(input("Interface number (ex: 1): ").strip())
-    usage_page_str = input("Usage page (hex, opcional - Enter para pular): ").strip()
-    usage_page = int(usage_page_str, 16) if usage_page_str else None
-    return {
-        "vendor_id": vendor_id,
-        "product_id": product_id,
-        "interface_number": interface_number,
-        "usage_page": usage_page,
-    }
+    print("\nInforme os dados manualmente...")
+    
+    while True:
+        try:
+            vendor_id = int(input("Vendor ID (hex, ex: 0c45): ").strip(), 16)
+            break
+        except ValueError:
+            print("  Valor invalido. Use formato hexadecimal.")
+            
+    while True:
+        try:
+            product_id = int(input("Product ID (hex, ex: 8501): ").strip(), 16)
+            break
+        except ValueError:
+            print("  Valor invalido. Use formato hexadecimal.")
+            
+    while True:
+        try:
+            interface_number = int(input("Interface number (ex: 1): ").strip())
+            break
+        except ValueError:
+            print("  Valor invalido. Informe um numero inteiro.")
 
+    usage_page = None
+    while True:
+        usage_page_str = input("Usage page (hex, opcional - Enter para pular): ").strip()
+        if not usage_page_str:
+            break
+        try:
+            usage_page = int(usage_page_str, 16)
+            break
+        except ValueError:
+            print("  Valor invalido. Use formato hexadecimal ou deixe em branco.")
+
+    return {
+        "vendor_id": vendor_id, "product_id": product_id,
+        "interface_number": interface_number, "usage_page": usage_page,
+    }
 
 def run_wizard() -> dict:
     """
