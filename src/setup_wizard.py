@@ -113,7 +113,7 @@ def run_wizard() -> dict:
         print("\nNenhum candidato automatico foi confirmado.")
         cfg = _manual_entry()
 
-    config.save_config(
+    config.save_device(
         cfg["vendor_id"], cfg["product_id"], cfg["interface_number"], cfg["usage_page"]
     )
     print("\nConfiguracao salva com sucesso!\n")
