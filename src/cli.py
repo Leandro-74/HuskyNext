@@ -1,6 +1,4 @@
-"""
-Interface de linha de comando (menu numerado) do HuskyNext.
-"""
+# Interface de Linha de Comando (CLI)
 
 from . import config
 from . import device
@@ -61,7 +59,7 @@ def _enviar(cfg: dict, state: colors.KeyboardState, descricao: str) -> None:
     finally:
         dev.close()
 
-
+# Define a cor, envia pro parse e envia para o device
 def _acao_definir_cor(cfg: dict, state: colors.KeyboardState) -> None:
     hex_str = input("Digite a cor em HEX (ex: FF5733 ou #00FF88): ").strip()
     try:
@@ -72,7 +70,7 @@ def _acao_definir_cor(cfg: dict, state: colors.KeyboardState) -> None:
     state.r, state.g, state.b = r, g, b
     _enviar(cfg, state, f"Cor RGB({r}, {g}, {b}) enviada")
 
-
+# Define o modo de iluminação e envia para o device
 def _acao_definir_modo(cfg: dict, state: colors.KeyboardState) -> None:
     print(_modes_menu_text())
     escolha = input("Escolha o modo: ").strip()
@@ -83,6 +81,7 @@ def _acao_definir_modo(cfg: dict, state: colors.KeyboardState) -> None:
     state.effect = codigo
     _enviar(cfg, state, f"Modo '{nome}' (0x{codigo:02x}) enviado")
 
+# Define o brilho e envia para o device
 def _acao_definir_brilho(cfg: dict, state: colors.KeyboardState) -> None:
     limpar_tela()
     print(BRIGHTS)
@@ -94,6 +93,7 @@ def _acao_definir_brilho(cfg: dict, state: colors.KeyboardState) -> None:
     state.bright = int(escolha) - 1
     _enviar(cfg, state, f"Brilho {escolha} enviado")
 
+# Envia o relatório original (o coletado) para fins de restauração ou teste
 def _acao_testar_original(cfg: dict) -> None:
     try:
         dev = device.open_by_config(cfg)
@@ -106,7 +106,7 @@ def _acao_testar_original(cfg: dict) -> None:
     finally:
         dev.close()
 
-
+# Carrega as configurações (ou o Wizard, caso não tenha configuração) e roda o menu
 def run() -> None:
     cfg = config.load_config()
     if cfg is None:
@@ -139,5 +139,6 @@ def run() -> None:
         else:
             print("Opcao invalida.")
 
+# Define a função de limpar tela para interface
 def limpar_tela():
     os.system('cls' if os.name == 'nt' else 'clear')

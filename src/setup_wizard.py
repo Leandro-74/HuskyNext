@@ -9,7 +9,6 @@ from . import config
 from . import device
 from . import colors
 
-
 def _describe(d: dict) -> str:
     manuf = d.get("manufacturer_string") or "?"
     prod = d.get("product_string") or "?"
@@ -19,9 +18,8 @@ def _describe(d: dict) -> str:
     usage_page = d.get("usage_page", 0)
     return f"{manuf} / {prod}  (VID={vid:#06x} PID={pid:#06x} iface={iface} usage_page={usage_page:#06x})"
 
-
+# Abre os candidatos, envia uma sequência de cores de teste e confirma o candidato
 def _try_candidate(d: dict) -> bool:
-    """Abre o candidato, manda uma cor de teste (vermelho) e pede confirmacao."""
     try:
         dev = device.open_by_path(d["path"])
     except OSError as e:
@@ -29,7 +27,8 @@ def _try_candidate(d: dict) -> bool:
         return False
 
     try:
-        report = colors.build_color_report(255, 0, 0)
+        
+        report = colors.build_report(colors.KeyboardState)
         device.send_report(dev, report)
     finally:
         dev.close()
