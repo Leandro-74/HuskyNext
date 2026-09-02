@@ -18,6 +18,14 @@ O projeto nasceu de uma engenharia reversa do protocolo USB HID do teclado: os c
 - Python 3.10 ou superior
 - Windows ou Linux (testado até agora principalmente no Windows; suporte a Linux em andamento)
 
+### ⚠️ Nota para usuários Linux
+Devido às restrições de permissão do kernel Linux em dispositivos USB raw (HID), você precisará criar uma regra do `udev` para rodar o script sem `sudo`.
+Crie o arquivo `/etc/udev/rules.d/99-huskynext.rules` com o seu VID e PID (exemplo):
+```
+SUBSYSTEM=="usb", ATTRS{idVendor}=="SEU_VID", ATTRS{idProduct}=="SEU_PID", MODE="0666"
+```
+Depois, recarregue as regras: `sudo udevadm control --reload-rules && udevadm trigger`
+
 ## Instalação
 
 ```bash
@@ -57,14 +65,18 @@ Se você confirmar, a configuração é salva em `~/.huskynext/config.json` e n�
 === HuskyNext - Controle de RGB para teclados Husky ===
 
 1. Definir cor (HEX)
-2. Testar cor original (diagnostico)
-3. Reconfigurar teclado (VID/PID)
-4. Sair
+2. Escolher modo de iluminação
+3. Brilho
+4. Testar cor original (diagnostico)
+5. Reconfigurar teclado (VID/PID)
+6. Sair
 ```
 
-- **1. Definir cor**: digite um código HEX (ex: `FF5733`) e o teclado muda para essa cor
-- **2. Testar cor original**: reenvia o exato pacote capturado na engenharia reversa — útil para diagnosticar problemas de comunicação
-- **3. Reconfigurar**: apaga a configuração salva e roda o assistente de identificação de novo (útil se você trocar de teclado ou a identificação salva parar de funcionar)
+- **1. Definir cor**: digite um código HEX (ex: `FF5733`) e o teclado mudará para essa cor
+- **2. Escolher modo de iluminação**: escolha um dos modos listados e o teclado mudará para ele
+- **3. Brilho**: escolha um dos níveis de brilho listados e o teclado mudará para ele
+- **4. Testar cor original**: reenvia o exato pacote capturado na engenharia reversa — útil para diagnosticar problemas de comunicação
+- **5. Reconfigurar**: apaga a configuração salva e roda o assistente de identificação de novo (útil se você trocar de teclado ou a identificação salva parar de funcionar)
 
 ## Estrutura do projeto
 
