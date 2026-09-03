@@ -1,10 +1,17 @@
-# HuskyNext
+<p align="center">
+  <img src="assets/logo.png" alt="Logo do HuskyNext" width="120">
+</p>
 
-Ferramenta em Python para controlar a cor do LED do teclado **Husky Sled** via linha de comando — sem depender do software oficial da Husky.
+<h1 align="center">HuskyNext</h1>
 
-O projeto nasceu de uma engenharia reversa do protocolo USB HID do teclado: os comandos de troca de cor foram capturados com Wireshark/USBPcap enquanto o software original da Husky era usado, e depois replicados diretamente via HID.
+<p align="center">
+  Ferramenta em Python para controlar a cor do LED do teclado <b>Husky Sled</b>
+  via linha de comando — sem depender do software oficial da Husky.
+</p>
 
 > ⚠️ Projeto não-oficial, feito por engenharia reversa. Sem vínculo com a Husky. Use por sua conta e risco.
+
+O projeto nasceu de uma engenharia reversa do protocolo USB HID do teclado: os comandos de troca de cor foram capturados com Wireshark/USBPcap enquanto o software original da Husky era usado, e depois replicados diretamente via HID.
 
 ## Funcionalidades
 
