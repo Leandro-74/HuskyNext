@@ -1,7 +1,7 @@
 from . import config
 from . import device
 from . import colors
-from . import cli
+import os
 
 def _describe(d: dict) -> str:
     manuf = d.get("manufacturer_string") or "?"
@@ -109,3 +109,6 @@ def run_wizard() -> dict:
     )
     print("\nConfiguracao salva com sucesso!\n")
     return cfg
+
+def limpar_tela():
+    os.system('cls' if os.name == 'nt' else 'clear')
