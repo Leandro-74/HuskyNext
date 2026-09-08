@@ -8,37 +8,6 @@ from . import menu
 import time
 import os
 
-MENU = """
-=== HuskyNext - Controle de RGB para teclados Husky ===
-
-1. Definir cor (HEX)
-2. Escolher modo de iluminação
-3. Brilho
-4. Testar cor original (diagnostico)
-5. Reconfigurar teclado (VID/PID)
-6. Sair
-
-"""
-
-BRIGHTS = """
-=== HuskyNext - Controle de Brilho ===
-
-1. 0%
-2. 25%
-3. 50%
-4. 75%
-5. 100%
-
-"""
-
-# Monta o texto do menu de modos de iluminação
-def _modes_menu_text() -> str:
-    linhas = ["", "=== HuskyNext - Modos de Iluminação ===", ""]
-    for i, (nome, _codigo) in enumerate(colors.EFFECTS, start=1):
-        linhas.append(f"{i}. {nome}")
-    linhas.append("")
-    return "\n".join(linhas)
-
 # Recupera o último state do device, caso não haja, retorna o padrão
 def _load_initial_state(cfg: dict) -> colors.KeyboardState:
     if all(k in cfg for k in ("effect", "bright", "r", "g", "b")):
