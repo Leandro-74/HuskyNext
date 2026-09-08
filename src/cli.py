@@ -49,7 +49,6 @@ def _acao_definir_modo(cfg: dict, state: colors.KeyboardState) -> None:
     limpar_tela()
     escolha = menu.perguntar(menu.menu_modos(colors.EFFECTS), "Escolha: ")
     if not escolha.isdigit() or not (1 <= int(escolha) <= len(colors.EFFECTS)):
-        print("Opcao invalida.")
         return
     nome, codigo = colors.EFFECTS[int(escolha) - 1]
     state.effect = codigo
@@ -60,7 +59,6 @@ def _acao_definir_brilho(cfg: dict, state: colors.KeyboardState) -> None:
     limpar_tela()
     escolha = menu.perguntar(menu.menu_brilho(), "Escolha: ")
     if not escolha.isdigit() or not (1 <= int(escolha) <= 5):
-        print("Opção Inválida.")
         return
     state.bright = int(escolha) - 1
     _enviar(cfg, state, f"Brilho {escolha} enviado")
