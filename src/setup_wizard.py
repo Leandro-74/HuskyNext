@@ -77,7 +77,7 @@ def _manual_entry() -> dict:
     }
 
 def run_wizard() -> dict:
-    cli.limpar_tela()
+    limpar_tela()
     print("\n=== Assistente de identificacao do teclado ===")
     print("Procurando dispositivos com controle proprietario (possivel iluminacao RGB)...\n")
 
