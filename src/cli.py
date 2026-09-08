@@ -4,6 +4,7 @@ from . import config
 from . import device
 from . import colors
 from . import setup_wizard
+from . import menu
 import time
 import os
 
@@ -64,7 +65,8 @@ def _enviar(cfg: dict, state: colors.KeyboardState, descricao: str) -> None:
 
 # Define a cor, envia pro parse e envia para o device
 def _acao_definir_cor(cfg: dict, state: colors.KeyboardState) -> None:
-    hex_str = input("Digite a cor em HEX (ex: FF5733 ou #00FF88): ").strip()
+    limpar_tela()
+    hex_str = menu.perguntar(menu.menu_cores(), "Escolha: ")
     try:
         r, g, b = colors.parse_hex_color(hex_str)
     except ValueError as e:
@@ -75,8 +77,7 @@ def _acao_definir_cor(cfg: dict, state: colors.KeyboardState) -> None:
 
 # Define o modo de iluminação e envia para o device
 def _acao_definir_modo(cfg: dict, state: colors.KeyboardState) -> None:
-    print(_modes_menu_text())
-    escolha = input("Escolha o modo: ").strip()
+    escolha = menu.perguntar(menu.menu_modos(colors.EFFECTS), "Escolha: ")
     if not escolha.isdigit() or not (1 <= int(escolha) <= len(colors.EFFECTS)):
         print("Opcao invalida.")
         return
@@ -87,27 +88,13 @@ def _acao_definir_modo(cfg: dict, state: colors.KeyboardState) -> None:
 # Define o brilho e envia para o device
 def _acao_definir_brilho(cfg: dict, state: colors.KeyboardState) -> None:
     limpar_tela()
-    print(BRIGHTS)
-    escolha = input("Escolha uma opção: ").strip()
+    escolha = menu.perguntar(menu.menu_brilho(), "Escolha: ")
     if not escolha.isdigit() or not (1 <= int(escolha) <= 5):
         print("Opção Inválida.")
         time.sleep(3)
         return
     state.bright = int(escolha) - 1
     _enviar(cfg, state, f"Brilho {escolha} enviado")
-
-# Envia o relatório original (o coletado) para fins de restauração ou teste
-def _acao_testar_original(cfg: dict) -> None:
-    try:
-        dev = device.open_by_config(cfg)
-    except ConnectionError as e:
-        print(e)
-        return
-    try:
-        n = device.send_report(dev, colors.original_report())
-        print(f"Relatorio original reenviado - {n} bytes escritos.")
-    finally:
-        dev.close()
 
 # Carrega as configurações (ou o Wizard, caso não tenha configuração) e roda o menu
 def run() -> None:
@@ -122,8 +109,8 @@ def run() -> None:
 
     while True:
         limpar_tela()
-        print(MENU)
-        escolha = input("Escolha uma opção: ").strip()
+        escolha = (menu.perguntar(menu.menu_principal(), "Escolha: "))
+        #escolha = input("Escolha uma opção: ").strip()
 
         if escolha == "1":
             _acao_definir_cor(cfg, state)
@@ -132,12 +119,10 @@ def run() -> None:
         elif escolha == "3":
             _acao_definir_brilho(cfg, state)
         elif escolha == "4":
-            _acao_testar_original(cfg)
-        elif escolha == "5":
             config.clear_device()
             cfg = setup_wizard.run_wizard()
-        elif escolha == "6":
-            print("Ate mais!")
+        elif escolha == "5":
+            print(" Ate mais!\n")
             break
         else:
             print("Opcao invalida.")

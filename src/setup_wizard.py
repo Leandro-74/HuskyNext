@@ -1,13 +1,7 @@
-"""
-Assistente de identificacao do teclado: lista candidatos prováveis,
-testa uma cor em cada um pedindo confirmacao visual da pessoa, e
-salva a configuracao encontrada. Se nada for confirmado, cai para
-entrada manual dos IDs.
-"""
-
 from . import config
 from . import device
 from . import colors
+from . import cli
 
 def _describe(d: dict) -> str:
     manuf = d.get("manufacturer_string") or "?"
@@ -83,10 +77,7 @@ def _manual_entry() -> dict:
     }
 
 def run_wizard() -> dict:
-    """
-    Executa o assistente de identificacao do teclado, salva a
-    configuracao encontrada e a devolve.
-    """
+    cli.limpar_tela()
     print("\n=== Assistente de identificacao do teclado ===")
     print("Procurando dispositivos com controle proprietario (possivel iluminacao RGB)...\n")
 
