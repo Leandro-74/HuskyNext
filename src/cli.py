@@ -61,7 +61,6 @@ def _acao_definir_brilho(cfg: dict, state: colors.KeyboardState) -> None:
     escolha = menu.perguntar(menu.menu_brilho(), "Escolha: ")
     if not escolha.isdigit() or not (1 <= int(escolha) <= 5):
         print("Opção Inválida.")
-        time.sleep(3)
         return
     state.bright = int(escolha) - 1
     _enviar(cfg, state, f"Brilho {escolha} enviado")
