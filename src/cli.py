@@ -46,6 +46,7 @@ def _acao_definir_cor(cfg: dict, state: colors.KeyboardState) -> None:
 
 # Define o modo de iluminação e envia para o device
 def _acao_definir_modo(cfg: dict, state: colors.KeyboardState) -> None:
+    limpar_tela()
     escolha = menu.perguntar(menu.menu_modos(colors.EFFECTS), "Escolha: ")
     if not escolha.isdigit() or not (1 <= int(escolha) <= len(colors.EFFECTS)):
         print("Opcao invalida.")
