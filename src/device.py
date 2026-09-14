@@ -1,17 +1,11 @@
-# Comunicação de baixo nível com devices HID
-
 import hid
 
-# Faixa de usage_page reservada para uso proprietario dos fabricantes
-# (vendor-specific) - forte indicio de controles como iluminacao RGB.
 VENDOR_SPECIFIC_USAGE_PAGE_MIN = 0xFF00
 VENDOR_SPECIFIC_USAGE_PAGE_MAX = 0xFFFF
 
-# Lista todos os devices HID conectados ao computador
 def list_all_devices() -> list[dict]:
     return hid.enumerate()
 
-# Lista os devices HID cujo o usage_page esteja dentro do range de dispositivos de controle de iluminação
 def list_candidate_devices() -> list[dict]:
     candidates = []
     for d in hid.enumerate():
@@ -20,7 +14,6 @@ def list_candidate_devices() -> list[dict]:
             candidates.append(d)
     return candidates
 
-# Acha o path de uma interface específica de um device HID
 def find_target_path(vid: int, pid: int, interface_number: int, usage_page: int | None = None) -> bytes | None:
     candidates = [
         d for d in hid.enumerate(vid, pid)
@@ -34,7 +27,6 @@ def find_target_path(vid: int, pid: int, interface_number: int, usage_page: int 
         return None
     return candidates[0]["path"]
 
-# Abre uma conexão com uma configuração já salva
 def open_by_config(cfg: dict) -> "hid.device":
     path = find_target_path(
         cfg["vendor_id"],
@@ -50,12 +42,10 @@ def open_by_config(cfg: dict) -> "hid.device":
         )
     return open_by_path(path)
 
-# Abre uma conexão com um path específico
 def open_by_path(path: bytes) -> "hid.device":
     dev = hid.device()
     dev.open_path(path)
     return dev
 
-# Envia um report para um device aberto
 def send_report(dev: "hid.device", report: bytes) -> int:
     return dev.write(report)

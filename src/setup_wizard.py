@@ -12,7 +12,6 @@ def _describe(d: dict) -> str:
     usage_page = d.get("usage_page", 0)
     return f"{manuf} / {prod}  (VID={vid:#06x} PID={pid:#06x} iface={iface} usage_page={usage_page:#06x})"
 
-# Abre os candidatos, envia uma sequência de cores de teste e confirma o candidato
 def _try_candidate(d: dict) -> bool:
     try:
         dev = device.open_by_path(d["path"])

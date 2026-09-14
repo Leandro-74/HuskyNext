@@ -1,5 +1,3 @@
-# Interface de Linha de Comando (CLI)
-
 from . import config
 from . import device
 from . import colors
@@ -8,7 +6,6 @@ from . import menu
 import time
 import os
 
-# Recupera o último state do device, caso não haja, retorna o padrão
 def _load_initial_state(cfg: dict) -> colors.KeyboardState:
     if all(k in cfg for k in ("effect", "bright", "r", "g", "b")):
         return colors.KeyboardState(
@@ -17,7 +14,6 @@ def _load_initial_state(cfg: dict) -> colors.KeyboardState:
             )
     return colors.KeyboardState()
 
-# Abre o device, monta o report, envia e salva o state atual
 def _enviar(cfg: dict, state: colors.KeyboardState, descricao: str) -> None:
     try:
         dev = device.open_by_config(cfg)
@@ -32,7 +28,6 @@ def _enviar(cfg: dict, state: colors.KeyboardState, descricao: str) -> None:
     finally:
         dev.close()
 
-# Define a cor, envia pro parse e envia para o device
 def _acao_definir_cor(cfg: dict, state: colors.KeyboardState) -> None:
     limpar_tela()
     hex_str = menu.perguntar(menu.menu_cores(), "Escolha: ")
@@ -44,7 +39,6 @@ def _acao_definir_cor(cfg: dict, state: colors.KeyboardState) -> None:
     state.r, state.g, state.b = r, g, b
     _enviar(cfg, state, f"Cor RGB({r}, {g}, {b}) enviada")
 
-# Define o modo de iluminação e envia para o device
 def _acao_definir_modo(cfg: dict, state: colors.KeyboardState) -> None:
     limpar_tela()
     escolha = menu.perguntar(menu.menu_modos(colors.EFFECTS), "Escolha: ")
@@ -54,7 +48,6 @@ def _acao_definir_modo(cfg: dict, state: colors.KeyboardState) -> None:
     state.effect = codigo
     _enviar(cfg, state, f"Modo '{nome}' (0x{codigo:02x}) enviado")
 
-# Define o brilho e envia para o device
 def _acao_definir_brilho(cfg: dict, state: colors.KeyboardState) -> None:
     limpar_tela()
     escolha = menu.perguntar(menu.menu_brilho(), "Escolha: ")
@@ -63,21 +56,16 @@ def _acao_definir_brilho(cfg: dict, state: colors.KeyboardState) -> None:
     state.bright = int(escolha) - 1
     _enviar(cfg, state, f"Brilho {escolha} enviado")
 
-# Carrega as configurações (ou o Wizard, caso não tenha configuração) e roda o menu
 def run() -> None:
     cfg = config.load_config()
     if cfg is None:
         print("Nenhuma configuracao encontrada. Vamos identificar seu teclado.")
         cfg = setup_wizard.run_wizard()
-
-    # Recupera o ultimo modo/cor enviados (persistidos entre execucoes),
-    # para nao "resetar" pros valores padrao do template ao reabrir o programa.
     state = _load_initial_state(cfg)
 
     while True:
         limpar_tela()
         escolha = (menu.perguntar(menu.menu_principal(), "Escolha: "))
-        #escolha = input("Escolha uma opção: ").strip()
 
         if escolha == "1":
             _acao_definir_cor(cfg, state)
@@ -94,6 +82,5 @@ def run() -> None:
         else:
             print("Opcao invalida.")
 
-# Define a função de limpar tela para interface
 def limpar_tela():
     os.system('cls' if os.name == 'nt' else 'clear')
