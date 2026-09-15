@@ -23,7 +23,6 @@ def menu_principal() -> list:
         "4. Reconfigurar conexão (VID/PID)",
         "5. Aplicar cores geradas pelo pywal",
         "6. Sair",
-
     ]
 
 def menu_cores() -> list:
