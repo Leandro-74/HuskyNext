@@ -3,6 +3,7 @@ from . import device
 from . import colors
 from . import setup_wizard
 from . import menu
+from . import wal
 import time
 import os
 
@@ -48,6 +49,23 @@ def _acao_definir_modo(cfg: dict, state: colors.KeyboardState) -> None:
     state.effect = codigo
     _enviar(cfg, state, f"Modo '{nome}' (0x{codigo:02x}) enviado")
 
+def _acao_pywal(cfg: dict, state: colors.KeyboardState) -> None:
+    limpar_tela()
+
+    target = menu.perguntar(menu.menu_pywal(), "Cor: ").strip().lower()
+
+    try:
+        palette = wal.load_palette()
+        hex_color = wal.get_hex_color(palette, target)
+        r, g, b = colors.parse_hex_color(hex_color)
+    except (FileNotFoundError, ValueError) as e:
+        print(e)
+        time.sleep(4)
+        return
+
+    state.r, state.g, state.b = r, g, b
+    _enviar(cfg, state, f"Cor Pywal '{target}' enviada")
+
 def _acao_definir_brilho(cfg: dict, state: colors.KeyboardState) -> None:
     limpar_tela()
     escolha = menu.perguntar(menu.menu_brilho(), "Escolha: ")
@@ -76,7 +94,10 @@ def run() -> None:
         elif escolha == "4":
             config.clear_device()
             cfg = setup_wizard.run_wizard()
+            state = _load_initial_state(cfg)
         elif escolha == "5":
+            _acao_pywal(cfg, state)
+        elif escolha == "6":
             print(" Ate mais!\n")
             break
         else:
