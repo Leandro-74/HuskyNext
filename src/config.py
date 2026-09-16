@@ -52,6 +52,42 @@ def clear_device() -> None:
     elif CONFIG_FILE.exists():
         CONFIG_FILE.unlink()
 
+def get_wal_settings() -> dict:
+    data = _read()
+
+    return {
+        "enabled": bool(data.get("wal_enabled", False)),
+        "target": str(data.get("wal_target", "auto")),
+        "poll_seconds": float(data.get("wal_poll_seconds", 2.0)),
+    }
+
+def set_wal_settings(
+    enabled: bool | None = None,
+    target: str | None = None,
+    poll_seconds: float | None = None,
+) -> None:
+    data = _read()
+
+    if enabled is not None:
+        data["wal_enabled"] = bool(enabled)
+
+    if target is not None:
+        data["wal_target"] = target
+    
+    if poll_seconds is not None:
+        data["wal_poll_seconds"] = float(poll_seconds)
+
+    _write(data)
+
+def get_calibration() -> dict:
+    data = _read()
+
+    return data.get("calibration", {})
+
+def save_calibration(calibration: dict) -> None:
+    data = _read()
+    data["calibration"] = calibration
+    _write(data)
 
 def clear_config() -> None:
     if CONFIG_FILE.exists():
