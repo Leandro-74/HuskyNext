@@ -4,6 +4,7 @@ from . import colors
 from . import setup_wizard
 from . import menu
 from . import wal
+from . import colorfx
 import time
 import os
 
@@ -21,11 +22,42 @@ def _enviar(cfg: dict, state: colors.KeyboardState, descricao: str) -> None:
     except ConnectionError as e:
         print(e)
         return
+
     try:
-        report = colors.build_report(state)
+        calibration = config.get_calibration()
+
+        cr, cg, cb = colorfx.apply_calibration(
+            state.r,
+            state.g,
+            state.b,
+            calibration,
+        )
+
+        corrected_state = colors.KeyboardState(
+            effect=state.effect,
+            bright=state.bright,
+            r=cr,
+            g=cg,
+            b=cb,
+        )
+
+        report = colors.build_report(corrected_state)
         n = device.send_report(dev, report)
-        print(f"{descricao} - {n} bytes escritos.")
-        config.save_state(state.effect, state.bright, state.r, state.g, state.b)
+
+        print(
+            f"{descricao} - {n} bytes escritos. "
+            f"RAW={state.r:02X}{state.g:02X}{state.b:02X} "
+            f"OUT={cr:02X}{cg:02X}{cb:02X}"
+        )
+
+        config.save_state(
+            state.effect,
+            state.bright,
+            state.r,
+            state.g,
+            state.b,
+        )
+
     finally:
         dev.close()
 
@@ -50,21 +82,48 @@ def _acao_definir_modo(cfg: dict, state: colors.KeyboardState) -> None:
     _enviar(cfg, state, f"Modo '{nome}' (0x{codigo:02x}) enviado")
 
 def _acao_pywal(cfg: dict, state: colors.KeyboardState) -> None:
-    limpar_tela()
+    while True:
+        limpar_tela()
 
-    target = menu.perguntar(menu.menu_pywal(), "Cor: ").strip().lower()
+        settings = config.get_wal_settings()
 
-    try:
-        palette = wal.load_palette()
-        hex_color = wal.get_hex_color(palette, target)
-        r, g, b = colors.parse_hex_color(hex_color)
-    except (FileNotFoundError, ValueError) as e:
-        print(e)
-        time.sleep(4)
-        return
+        escolha = menu.perguntar(
+            menu.menu_pywal(settings["enabled"], settings["target"]),
+            "Escolha: "
+        )
 
-    state.r, state.g, state.b = r, g, b
-    _enviar(cfg, state, f"Cor Pywal '{target}' enviada")
+        if escolha == "1":
+            new_enabled = not settings["enabled"]
+            config.set_wal_settings(enabled=new_enabled)
+
+            if new_enabled:
+                _acao_aplicar_wal(cfg, state, settings["target"])
+
+        elif escolha == "2":
+            limpar_tela()
+
+            target = menu.perguntar(
+                menu.menu_pywal_target(),
+                "Cor: "
+            ).strip().lower()
+
+            try:
+                palette = wal.load_palette()
+                wal.resolve_target(palette, target)
+                config.set_wal_settings(target=target)
+            except (FileNotFoundError, ValueError) as e:
+                print(e)
+                time.sleep(4)
+
+        elif escolha == "3":
+            _acao_aplicar_wal(cfg, state)
+
+        elif escolha == "4":
+            break
+
+        else:
+            print("Opcao invalida.")
+            time.sleep(2)
 
 def _acao_definir_brilho(cfg: dict, state: colors.KeyboardState) -> None:
     limpar_tela()
@@ -73,6 +132,26 @@ def _acao_definir_brilho(cfg: dict, state: colors.KeyboardState) -> None:
         return
     state.bright = int(escolha) - 1
     _enviar(cfg, state, f"Brilho {escolha} enviado")
+
+def _acao_aplicar_wal(cfg: dict, state: colors.KeyboardState, target: str | None = None) -> bool:
+    settings = config.get_wal_settings()
+
+    if target is None:
+        target = settings["target"]
+
+    try:
+        palette = wal.load_palette()
+        key, hex_color = wal.resolve_target(palette, target)
+        r, g, b = colors.parse_hex_color(hex_color)
+    except (FileNotFoundError, ValueError) as e:
+        print(e)
+        time.sleep(4)
+        return False
+
+    state.r, state.g, state.b = r, g, b
+    _enviar(cfg, state, f"Pywal '{key}' aplicado")
+
+    return True
 
 def run() -> None:
     cfg = config.load_config()

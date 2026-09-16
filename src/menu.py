@@ -21,7 +21,7 @@ def menu_principal() -> list:
         "2. Definir modo de iluminação",
         "3. Definir Brilho",
         "4. Reconfigurar conexão (VID/PID)",
-        "5. Aplicar cores geradas pelo pywal",
+        "5. Pywal",
         "6. Sair",
     ]
 
@@ -45,16 +45,33 @@ def menu_brilho() -> list:
         "5. 100%",
     ]
 
-def menu_pywal() -> list:
+def menu_pywal(enabled: bool, target: str) -> list:
+    status = "ativada" if enabled else "desativada"
     return [
         "HuskyNext - Pywal",
         _sep(),
+        f"Sincronização: {status}",
+        f"Cor usada: {target}",
+        _sep(),
+        "Sincroniza"
         "Escolha uma cor da paleta do pywal.",
         "Opcoes: foreground, background, cursor",
         "ou color0, color1, ..., color15.",
         "Exemplo: color5",
     ]
 
+def menu_pywal_target() -> list:
+    return [
+        "HuskyNext - Cor do Pywal",
+        _sep(),
+        "Escolha qual cor usar da paleta.",
+        "",
+        "auto       - escolhe automaticamente",
+        "foreground - cor principal clara",
+        "background - cor de fundo",
+        "cursor     - cor do cursor",
+        "color0..color15 - cores da paleta",
+    ]
 def menu_modos(EFFECTS: list) -> list:
     linhas = []
     total = len(EFFECTS)
