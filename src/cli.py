@@ -5,6 +5,7 @@ from . import setup_wizard
 from . import menu
 from . import wal
 from . import colorfx
+from . import console
 import time
 import os
 
@@ -154,6 +155,7 @@ def _acao_aplicar_wal(cfg: dict, state: colors.KeyboardState, target: str | None
     return True
 
 def run() -> None:
+    console.ajustar_janela()
     cfg = config.load_config()
     if cfg is None:
         print("Nenhuma configuracao encontrada. Vamos identificar seu teclado.")
