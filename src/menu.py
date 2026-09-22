@@ -1,5 +1,21 @@
-LARGURA = 55
+import shutil
+
+LARGURA = 56
 ESC = "\x1b"
+
+def _pad_horizontal() -> int:
+    try:
+        cols = shutil.get_terminal_size().columns
+    except Exception:
+        cols = LARGURA + 2
+    return max(0, (cols - (LARGURA+2)) // 2)
+
+def _pad_vertical(total_linhas: int) -> int:
+    try:
+        rows = shutil.get_terminal_size().lines
+    except Exception:
+        return 0
+    return max(0, (rows - total_linhas) // 2)
 
 def _linha(texto: str = "") -> str:
     return "║" + (" " + texto).ljust(LARGURA) + "║"
@@ -94,14 +110,21 @@ def menu_modos(EFFECTS: list) -> list:
     ]
 
 def abrir_caixa(linhas: list, prompt: str) -> None:
-    print(_topo())
+    pad = _pad_horizontal()
+    total = len(linhas) + 4
+    print("\n" * _pad_vertical(total), end="")
+
+    def out(s: str) -> None:
+        print(" " * pad + s)
+
+    out(_topo())
     for l in linhas:
-        print(l if l.startswith("╠") else _linha(l))
-    print(_sep())
+        out(l if l.startswith("╠") else _linha(l))
+    out(_sep())
     texto = " " + prompt
-    print("║" + texto + " " * max(1, LARGURA - len(texto)) + "║")
-    print(_fundo())
-    col = 2 + len(texto)
+    out("║" + texto + " " * max(1, LARGURA - len(texto)) + "║")
+    out(_fundo())
+    col = pad + 2 + len(texto)
     print(f"{ESC}[2A{ESC}[{col}G", end="", flush=True)
 
 def fechar_caixa() -> None:
